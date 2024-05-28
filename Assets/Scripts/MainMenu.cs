@@ -62,6 +62,7 @@ public class MainMenu : MonoBehaviour
 	{
 		if (levelOld != level)
 		{
+			CleanUpMemory();
 			ChangeCategory(level);
 		}
 	}
@@ -82,7 +83,6 @@ public class MainMenu : MonoBehaviour
 			Photos.SetActive(false);
 			Facts.SetActive(false);
 			//archive.GetComponent<Archive>().imageCache.Clear();
-			CleanUpMemory();
 
 			levelOld = 1;
 			

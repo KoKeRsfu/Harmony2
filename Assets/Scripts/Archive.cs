@@ -18,8 +18,8 @@ public class Archive : MonoBehaviour
 
 	//public const string adminApi = "http://62.109.23.170:8888/api/harmony/";
 	
-	public const string adminApi = "http://95.188.79.124:8888/api/harmony/";
-	//public const string adminApi = "http://192.168.0.240:8888/api/harmony/";
+	//public const string adminApi = "http://95.188.79.124:8888/api/harmony/";
+	public const string adminApi = "http://192.168.0.240:8888/api/harmony/";
 	
 	public List<string> categoriesType = new List<string>() { "MUSIC", "THEATRE", "CINEMA", "LITERATURE", "JOURNEY" };
 	public List<string> mediaType = new List<string>() { "FACT", "PHOTO_VIDEO", "MOVIE", "SOUND", "COVER" }; //только для запроса conntent/{id content}/media
@@ -721,14 +721,17 @@ public class Archive : MonoBehaviour
 						yield break; // Прекратить выполнение если файл уже существует
 					}
 					UnityWebRequest request = UnityWebRequest.Get(media.url);
+					requestManager.activeTasks++;	
 					yield return request.SendWebRequest();
-
+				
 					if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
 					{
 						Debug.LogError("Ошибка загрузки аудио: " + request.error);
+						requestManager.TaskCompleted();
 					}
 					else
 					{
+						requestManager.TaskCompleted();
 						File.WriteAllBytes(localPath, request.downloadHandler.data);
 						Debug.Log("Аудио сохранено: " + localPath);
 					}
