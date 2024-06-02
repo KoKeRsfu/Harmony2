@@ -18,8 +18,8 @@ public class Archive : MonoBehaviour
 
 	//public const string adminApi = "http://62.109.23.170:8888/api/harmony/";
 	
-	//public const string adminApi = "http://95.188.79.124:8888/api/harmony/";
-	public const string adminApi = "http://192.168.0.240:8888/api/harmony/";
+	public const string adminApi = "http://95.188.79.124:8888/api/harmony/";
+	//public const string adminApi = "http://192.168.0.240:8888/api/harmony/";
 	
 	public List<string> categoriesType = new List<string>() { "MUSIC", "THEATRE", "CINEMA", "LITERATURE", "JOURNEY" };
 	public List<string> mediaType = new List<string>() { "FACT", "PHOTO_VIDEO", "MOVIE", "SOUND", "COVER" }; //только для запроса conntent/{id content}/media
@@ -522,15 +522,23 @@ public class Archive : MonoBehaviour
 			//Debug.Log("Data fetched from API and cached: " + data);
 			UpdateContent(contentId, data);
 		});
-
+	}
+	
+	public IEnumerator MediaRequest(string contentId)
+	{
 		// Запрос для получения медиа, связанного с контентом
 		string mediaUrl = adminApi + "content/" + contentId + "/media";
+		string data2 = "";
 		yield return FetchData(mediaUrl, (data) =>
 		{
+			data2 = data;
+			
 			//Debug.Log("Data fetched from API and cached: " + data);
-			UpdateMedia(contentId, data);
 		});
+		
+		yield return UpdateMedia(contentId, data2);
 	}
+	
 	private IEnumerator FetchData(string url, Action<string> onSuccess)
 	{
 		/*if (cache.TryGetValue(url, out string cachedData))
@@ -606,9 +614,9 @@ public class Archive : MonoBehaviour
 				Debug.LogError("Could not parse content data: " + e.Message + " " + jsonData);
 			}
 	}
-	private void UpdateMedia(string contentId, string jsonData)
+	private IEnumerator UpdateMedia(string contentId, string jsonData)
 	{
-		try
+/*		try
 		{
 			//Debug.LogWarning("try");
 			Content content = JsonUtility.FromJson<Content>(jsonData);
@@ -619,13 +627,26 @@ public class Archive : MonoBehaviour
 				targetContent.media = content.media;
 				//Debug.LogWarning(targetContent.media.ToString());
 				// Optionally process each media item here, e.g., fetch textures
-				StartCoroutine(CacheMedia(targetContent.media, targetContent));
+				yield return StartCoroutine(CacheMedia(targetContent.media, targetContent));
 			}
 		}
 			catch (Exception e)
 			{
 				Debug.LogError("Could not parse media data: " + e.Message + " " + jsonData);
-			}
+		}
+		*/
+
+		Content content = JsonUtility.FromJson<Content>(jsonData);
+		Content targetContent = objectContent.contents.Find(c => c.id == contentId);
+		if (targetContent != null)
+		{
+			//Debug.LogWarning("!=NULL");
+			targetContent.media = content.media;
+			//Debug.LogWarning(targetContent.media.ToString());
+			// Optionally process each media item here, e.g., fetch textures
+			yield return CacheMedia(targetContent.media, targetContent);
+		}
+		
 	}
 	public string ReplaceMediaWithResize(string input)
 	{
@@ -891,7 +912,7 @@ public class Archive : MonoBehaviour
 
         if (!string.IsNullOrEmpty(www.error))
         {
-            Debug.LogError("Ошибка загрузки аудио: " + www.error);
+            Debug.LogError("Ошибка загрузки аудио: " + www.error + " " + filePath);
         }
         else
         {
@@ -903,7 +924,7 @@ public class Archive : MonoBehaviour
         requestManager.TaskCompleted();
     }
 
-    public IEnumerator AssignVideoClip(string fileId, string format, VideoPlayer videoPlayer, Action onComplete)
+ /*   public IEnumerator AssignVideoClip(string fileId, string format, VideoPlayer videoPlayer, Action onComplete)
     {
         string filePath = Path.Combine(Application.persistentDataPath, "video", fileId + "." + format);
         string url = "file://" + filePath;
@@ -942,7 +963,7 @@ public class Archive : MonoBehaviour
             Debug.LogError("Ошибка загрузки видео: " + message);
         }
     }
-
+*/
     //public IEnumerator AssignAudioClip(string fileId, string format, AudioSource audioSource)
     //{
     //    string filePath = Path.Combine(audioFolder, fileId + "." + format);

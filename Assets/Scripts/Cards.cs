@@ -138,7 +138,7 @@ public class Cards : MonoBehaviour
 		}
 	}
 	
-	IEnumerator AddToShownContent()
+	public IEnumerator AddToShownContent()
 	{
 		yield return new WaitForSeconds(0.02f);
 		

@@ -49,12 +49,29 @@ public class ClickCard : MonoBehaviour
 	{
 		Debug.Log("ClickOnCard");
 		
+		StartCoroutine("ClickOnCardCo");
+	}
+
+	private IEnumerator ClickOnCardCo()
+	{
+		archive.GetComponent<Archive>().requestManager.activeTasks++;
+		archive.GetComponent<Archive>().requestManager.Show();
+		
+		yield return archive.GetComponent<Archive>().MediaRequest(archive.GetComponent<Archive>().objectContent.contents[transform.GetSiblingIndex()].id);
+			
+		thisCard = transform.parent.parent.parent.parent.GetChild(0).GetChild(transform.GetSiblingIndex()).GetComponent<ClickCard>().thisCard;
+			
+		yield return new WaitForSeconds(0.1f);
+			
 		transform.parent.gameObject.SetActive(true);
 		if (thisCard.cover is null) coverOn = false;
 		else { SetCoverImage(); }
 		CreateObject();
-		Invoke("CreateObject", 0.02f);
+		//Invoke("CreateObject", 0.02f);
 		controller.GetComponent<MainMenu>().level = 3;
+		
+		archive.GetComponent<Archive>().requestManager.TaskCompleted();
+		
 		Canvas.ForceUpdateCanvases();
 	}
 

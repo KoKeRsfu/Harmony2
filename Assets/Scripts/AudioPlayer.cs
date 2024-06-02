@@ -16,7 +16,7 @@ public class AudioPlayer : MonoBehaviour
 
 	public bool status; // false = 1x, true = 2x
 	public TMP_Text timerText;
-	private bool timerActive;
+	public bool timerActive;
 
 	public AudioSource audioSource;
     
@@ -100,6 +100,11 @@ public class AudioPlayer : MonoBehaviour
 		status = false;
 		timerActive = false;
 		timerText.text = "00:00";
+        
+		audioSource.playOnAwake = false;
+        
+		audioSource.Pause();
+		this.GetComponent<Image>().sprite = play;
         
 		//audioSource.Play();
 	}
