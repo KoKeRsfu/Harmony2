@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +10,14 @@ using System.IO;
 
 public class VideoPlayerController : MonoBehaviour
 {
+	
+	public TextMeshProUGUI descriptionText;
+	
+	public string description;
+	public string videoUrl;
+	
+	public GameObject errorMessage;
+	
     public VideoPlayer videoPlayer; 
     public Slider videoSlider; 
     public TMP_Text textTime;
@@ -55,10 +63,15 @@ public class VideoPlayerController : MonoBehaviour
         isDragging = false;
         videoPlayer.Play();
     }
-    public IEnumerator GetVideoUrl()//http://62.109.23.170/uploads/test.mp4  http://95.188.79.124/uploads/movie/hozyain_tajgi.avi
-    {
-        UnityWebRequest request = UnityWebRequest.Get("http://62.109.23.170/uploads/test.mp4"); // http://62.109.23.170/uploads/media/cb5cb3ed-e3c3-4946-b8f3-8f10c5182b92.avi
+	public IEnumerator GetVideoUrl()//http://62.109.23.170/uploads/test.mp4  http://95.188.79.124/uploads/movie/hozyain_tajgi.avi
+	{
+		/*
+		Debug.Log("пробую получить реквест");
+	    UnityWebRequest request = UnityWebRequest.Get("http://95.188.79.124/uploads/movie/hozyain_tajgi.avi"); // http://62.109.23.170/uploads/media/cb5cb3ed-e3c3-4946-b8f3-8f10c5182b92.avi
+        
         yield return request.SendWebRequest();
+
+		Debug.Log("реквест получен, обрабатываю");
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
@@ -66,16 +79,27 @@ public class VideoPlayerController : MonoBehaviour
         }
         else
         {
-            //����� ���
-            videoPlayer.url = "http://62.109.23.170/uploads/test.mp4";
+		*/
+		videoPlayer.url = videoUrl;
             videoPlayer.prepareCompleted += (source) =>
             {
                 videoSlider.maxValue = (float)videoPlayer.length;
             };
-            videoPlayer.Prepare();
-            videoPlayer.Play();
-            playVideo = true;
-        }
+          
+		descriptionText.text = description;
+          
+		errorMessage.SetActive(false);
+           
+		videoPlayer.Prepare();
+		videoPlayer.Play();
+		playVideo = true;
+		yield return new WaitForSeconds(3);
+		if (!videoPlayer.isPlaying)
+		{
+			errorMessage.SetActive(true);
+		};
+			
+		//}
     }
     void TimeCalc(float time)
     {

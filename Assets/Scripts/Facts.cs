@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using Image = UnityEngine.UI.Image;
 
 public class Facts : MonoBehaviour
 {
+	[SerializeField] Sprite errorSprite;
+	
 	//public List<String> factsList;
 
 	public GameObject firstFact;
@@ -22,6 +25,10 @@ public class Facts : MonoBehaviour
 	public Swipe swipeDetector;
 
 	public List<Archive.Media> facts = new List<Archive.Media>();
+	
+	public List<Sprite> factImages = new List<Sprite>();
+	public List<string> factDescriptions = new List<string>();
+	
 	//public List<Sprite> facts;
 	void Start()
 	{
@@ -41,40 +48,56 @@ public class Facts : MonoBehaviour
 		}
 	}
 
-	//public void CreateFacts(List<Archive.Media> list)
-	//{
-	//    facts.Clear();
-	//    facts = list;
-	//    status = 0;
-	//    firstFact.SetActive(false);
-	//    secondFact.SetActive(false);
-	//    thirdFact.SetActive(false);
+	public IEnumerator CreateFacts()
+	{
+	    status = 0;
+	    firstFact.SetActive(false);
+	    secondFact.SetActive(false);
+		thirdFact.SetActive(false);
+		factImages.Clear();
 
-	//    ButtonFilters.DeleteAllChildren(sliderBox);
-	//    for(int i = 0; i < list.Count; i ++)
-	//    {
-	//        GameObject newSlider = Instantiate(prefabSlider, sliderBox.transform);
-	//        if (i == 0)
-	//        {
-	//            Texture2D texture = archive.GetComponent<Archive>().coverCache[list[i].id];
-	//            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-	//            secondFact.GetComponent<Image>().sprite = sprite;
-	//            //secondFact.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = (i+1).ToString();
-	//            //secondFact.transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = factsList[i];
-	//            newSlider.GetComponent<Image>().sprite = blueSprite;
-	//            secondFact.SetActive(true);
-	//        }
-	//        if (i == 1)
-	//        {
-	//            Texture2D texture = archive.GetComponent<Archive>().coverCache[list[i].id];
-	//            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-	//            thirdFact.GetComponent<Image>().sprite = sprite;
-	//            //thirdFact.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = (i+1).ToString();
-	//            //thirdFact.transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = factsList[i];
-	//            thirdFact.SetActive(true);
-	//        }
-	//    }
-	//}
+	    ButtonFilters.DeleteAllChildren(sliderBox);
+		for(int i = 0; i < facts.Count; i ++)
+		{
+			//archive.GetComponent<Archive>().MediaRequest(facts[i].id);
+			
+			GameObject newSlider = Instantiate(prefabSlider, sliderBox.transform);
+			
+			archive.GetComponent<Archive>().requestManager.activeTasks++;
+			archive.GetComponent<Archive>().requestManager.Show();
+			UnityWebRequest request = UnityWebRequestTexture.GetTexture(facts[i].url);
+			yield return request.SendWebRequest();
+			archive.GetComponent<Archive>().requestManager.TaskCompleted();
+		        
+			if(request.isNetworkError || request.isHttpError) 
+			{
+				Debug.Log(request.error);
+					
+				factImages.Add(errorSprite);
+			} 
+			else 
+			{
+				Texture2D texture = ((DownloadHandlerTexture) request.downloadHandler).texture;
+				Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+				factImages.Add(sprite);
+			}
+			
+			string description = facts[i].description;
+			factDescriptions.Add(description);
+		}
+		
+		sliderBox.transform.GetChild(0).GetComponent<Image>().sprite = blueSprite;
+		secondFact.SetActive(true);
+		secondFact.GetComponent<Image>().sprite = factImages[status];
+		secondFact.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = factDescriptions[status].ToString();
+		
+		if (factImages.Count > 1) 
+		{
+			thirdFact.SetActive(true);
+			thirdFact.GetComponent<Image>().sprite = factImages[status + 1];	
+			thirdFact.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = factDescriptions[status + 1].ToString();
+		}
+	}
     
 	public void ClickRight()
 	{
@@ -107,6 +130,31 @@ public class Facts : MonoBehaviour
 			else return;
 		}
 		sliderBox.transform.GetChild(status).GetComponent<Image>().sprite = blueSprite;
+
+		secondFact.GetComponent<Image>().sprite = factImages[status];
+		secondFact.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = factDescriptions[status].ToString();
+		
+		if (status > 0) 
+		{
+			firstFact.SetActive(true);	
+			firstFact.GetComponent<Image>().sprite = factImages[status - 1];	
+			firstFact.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = factDescriptions[status - 1].ToString();
+		}
+		else 
+		{
+			firstFact.SetActive(false);	
+		}
+		
+		if (status < facts.Count - 1) 
+		{
+			thirdFact.SetActive(true);
+			thirdFact.GetComponent<Image>().sprite = factImages[status + 1];	
+			thirdFact.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = factDescriptions[status + 1].ToString();
+		}
+		else
+		{
+			thirdFact.SetActive(false);
+		}
 
 		//if (status > 0)
 		//{

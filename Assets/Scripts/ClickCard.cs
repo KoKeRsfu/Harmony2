@@ -67,7 +67,7 @@ public class ClickCard : MonoBehaviour
 		if (thisCard.cover is null) coverOn = false;
 		else { SetCoverImage(); }
 		CreateObject();
-		//Invoke("CreateObject", 0.02f);
+		Invoke("CreateObject", 0.1f);
 		controller.GetComponent<MainMenu>().level = 3;
 		
 		archive.GetComponent<Archive>().requestManager.TaskCompleted();
@@ -191,13 +191,23 @@ public class ClickCard : MonoBehaviour
 
 		//MOVIE
 		List<Archive.Media> movieCheck = thisCard.media.Where(m => m.type == "MOVIE").ToList();
-		content.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.SetActive(false);
+		if (movieCheck.Count > 0) 
+		{
+			content.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.SetActive(true);
+			
+			controller.GetComponent<VideoPlayerController>().videoUrl = 	movieCheck[movieCheck.Count - 1].url;
+			controller.GetComponent<VideoPlayerController>().description = movieCheck[movieCheck.Count - 1].description;
+		}
+		else 
+		{
+			content.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.SetActive(false);
+		}
 		//if (movieCheck.Count == 0) { content.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.SetActive(false); }
 		//else
 		//{
-		//bottBtn = true;
+		bottBtn = true;
 		//    Debug.LogWarning(movieCheck.Count);
-		//    if(thisCard.title == "Где-то гремит война")
+		//    if(thisCard.title == "Где-то гремит война")		
 		//    {
 		//        content.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.SetActive(true);
 		//        content.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(controller.GetComponent<MainMenu>().CLickVideo);
@@ -226,18 +236,19 @@ public class ClickCard : MonoBehaviour
 
 		//FACTS
 		List<Archive.Media> factCheck = thisCard.media.Where(m => m.type == "FACT").ToList();
-		content.transform.GetChild(1).gameObject.transform.GetChild(0).gameObject.transform.GetChild(3).gameObject.SetActive(false); factsBtn = false;
-		//if (factCheck.Count == 0) { content.transform.GetChild(1).gameObject.transform.GetChild(0).gameObject.transform.GetChild(3).gameObject.SetActive(false); factsBtn = false;/*textblockSize += 115; viewportSize += 115; */}
-		//else
-		//{
-		//    content.transform.GetChild(1).gameObject.transform.GetChild(0).gameObject.transform.GetChild(3).gameObject.SetActive(true);
-		//    factsBtn = true;
-		//    controller.GetComponent<Facts>().facts = factCheck;
-		//    controller.GetComponent<Facts>().CreateFacts(factCheck);
-		//    //controller.GetComponent<Facts>().CreateFacts(factCheck);
-		//    //CreateFacts
-		//    //content.transform.GetChild(1).gameObject.transform.GetChild(7).gameObject.transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener(this.GetComponent<ClickCard>().GalleryBtn);
-		//}
+		Debug.Log("количество фактов 1: " + factCheck.Count);
+		if (factCheck.Count > 0) 
+		{
+			content.transform.GetChild(1).gameObject.transform.GetChild(0).gameObject.transform.GetChild(3).gameObject.SetActive(true);
+			factsBtn = true;
+			controller.GetComponent<Facts>().facts = factCheck;
+			//controller.GetComponent<Facts>().StartCoroutine("CreateFacts");
+		}
+		else 
+		{
+			content.transform.GetChild(1).gameObject.transform.GetChild(0).gameObject.transform.GetChild(3).gameObject.SetActive(false); 
+			factsBtn = false;
+		}
 
 		//COVER ?
 		//Включена ли обложка

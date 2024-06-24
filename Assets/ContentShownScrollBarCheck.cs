@@ -8,7 +8,12 @@ public class ContentShownScrollBarCheck : MonoBehaviour
 	private Scrollbar scroll;
 	[SerializeField] Cards cards;
 	
-	private bool canLoad = true;
+	public bool canLoad = true;
+	
+	protected void OnEnable()
+	{
+		canLoad = true;
+	}
 	
     // Start is called before the first frame update
     void Start()

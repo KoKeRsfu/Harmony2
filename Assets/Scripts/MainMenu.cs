@@ -25,7 +25,6 @@ public class MainMenu : MonoBehaviour
 	public GameObject btnAbout;
 	public GameObject archive;
 
-	public int numCategory;
 	public int level;
 	private int levelOld;
 	public string title;
@@ -43,7 +42,6 @@ public class MainMenu : MonoBehaviour
 		flagGalery = false;
 		level = levelOld = 1;
 		ChangeCategory(level);
-		numCategory = -1;
 
 		StartCoroutine(archive.GetComponent<Archive>().CategoryRequest());
 		StartCoroutine(archive.GetComponent<Archive>().FetchContent());
@@ -187,7 +185,6 @@ public class MainMenu : MonoBehaviour
 		btnLayout1.GetComponent<ButtonFilters>().StartCreate(btnLayout1.GetComponent<ButtonFilters>().filtersTitles);
 		btnLayout1.GetComponent<ButtonFilters>().filtersTitles.Clear();
 		//CardContentObject.GetComponent<Cards>().StartCreate();
-		numCategory = number;
 		level = 2;
 		LayoutRebuilder.ForceRebuildLayoutImmediate(ScrollView.GetComponent<RectTransform>());
 		Canvas.ForceUpdateCanvases();
@@ -247,7 +244,7 @@ public class MainMenu : MonoBehaviour
 	{
 		level = 4;
 		flagGalery = false;
-		//StartCoroutine(this.GetComponent<VideoPlayerController>().GetVideoUrl());
+		StartCoroutine(this.GetComponent<VideoPlayerController>().GetVideoUrl());
 		MediaPlayer.SetActive(true);
 		btnbck.transform.GetChild(0).gameObject.SetActive(true);
 		btnbck.transform.GetChild(1).gameObject.SetActive(false);
@@ -262,7 +259,7 @@ public class MainMenu : MonoBehaviour
 	{
 		//this.GetComponent<Facts>().factsList = new List<string> {"Текст первого факта", "Текст второго факта", 
 		//    "Текст третьего факта", "Текст четвертого факта", "Текст пятого факта"};
-		//this.GetComponent<Facts>().CreateFacts();
+		this.GetComponent<Facts>().StartCoroutine("CreateFacts");
 		level = 4;
 		flagGalery = false;
 		Facts.SetActive(true);

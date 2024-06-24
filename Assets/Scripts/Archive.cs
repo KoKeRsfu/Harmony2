@@ -31,7 +31,7 @@ public class Archive : MonoBehaviour
 	//private List<Texture2D> textures = new();
 	public CacheInspector cacheInspector = new CacheInspector();
 	private int countCache = 0;
-	//private int countCover = 0;
+	private int countCover = 0;
 	//private int countImage = 0;
 	public GameObject infoPrefab;
 	public LoadingIndicator requestManager;
@@ -77,7 +77,7 @@ public class Archive : MonoBehaviour
 	public class CacheInspector
 	{
 		public SerializableDictionary<string, string> cache = new SerializableDictionary<string, string>();
-		//public SerializableDictionary<string, Texture2D> coverCache = new SerializableDictionary<string, Texture2D>();
+		public SerializableDictionary<string, Texture2D> coverCache = new SerializableDictionary<string, Texture2D>();
 		//public SerializableDictionary<string, Texture2D> imageCache = new SerializableDictionary<string, Texture2D>();
 	}
 
@@ -404,6 +404,7 @@ public class Archive : MonoBehaviour
 
 	public IEnumerator FetchContent() // Запрос category/{type}/list
 	{
+		requestManager.activeTasks++;
 		foreach (string type in categoriesType)
 		{
 			string url = adminApi + "category/" + type + "/list";
@@ -424,7 +425,7 @@ public class Archive : MonoBehaviour
 						if (root.contents.Count > 0)
 						{
 							foreach (Content content in root.contents)
-							{
+																	{
 								if (string.IsNullOrEmpty(content.cover.url))
 								{
 									continue;
@@ -443,7 +444,7 @@ public class Archive : MonoBehaviour
 									if (File.Exists(savePath))
 									{
 										Debug.Log("File already exists: " + savePath);
-										yield break; // Прекратить выполнение если файл уже существует
+										//yield break; // Прекратить выполнение если файл уже существует
 									}
 									File.WriteAllBytes(savePath, imageBytes);
 									Debug.Log("Image saved to " + savePath);
@@ -469,6 +470,7 @@ public class Archive : MonoBehaviour
 				}
 			}
 		}
+		requestManager.TaskCompleted();
 		//textures.Clear();
 	}
    
@@ -484,21 +486,21 @@ public class Archive : MonoBehaviour
 				if (objectContent.contents[i].description is not null) objectContent.contents[i].description = ConvertHTMLToTMP(objectContent.contents[i].description);
 				yield return StartCoroutine(ContentRequest(objectContent.contents[i].id));
 
-				//if (objectContent.contents[i].cover != null)
-				//{
-				//    if (objectContent.contents[i].cover.id is not null)
-				//    {
-				//        if (coverCache.ContainsKey(objectContent.contents[i].cover.id))
-				//        {
+				if (objectContent.contents[i].cover != null)
+				{
+				    if (objectContent.contents[i].cover.id is not null)
+				    {
+					    //if (coverCache.ContainsKey(objectContent.contents[i].cover.id))
+				        {
 
-				//            yield return StartCoroutine(ContentRequest(objectContent.contents[i].id));
-				//        }
-				//    }
-				//}
-				//else
-				//{
+				            yield return StartCoroutine(ContentRequest(objectContent.contents[i].id));
+				        }
+				    }
+				}
+				else
+				{
 
-				//}
+				}
 			}
 			// Все обложки обработаны, вызываем callback
 			//textures.Clear();
@@ -757,24 +759,24 @@ public class Archive : MonoBehaviour
 						Debug.Log("Аудио сохранено: " + localPath);
 					}
 			}
-			//if (media.id != null && media.url != null && media.type == "MOVIE")
-			//{
-			//    string localPath = Path.Combine(videoFolder, media.id + "." + GetSubstringAfterLastDot(media.url));
-			//    Debug.LogWarning(content.id + "^ " + media.url + "  =  " + GetSubstringAfterLastDot(media.url));
-			//    UnityWebRequest request = UnityWebRequest.Get(media.url);
-			//    yield return request.SendWebRequest();
+			/*if (media.id != null && media.url != null && media.type == "MOVIE")
+			{
+			    string localPath = Path.Combine(videoFolder, media.id + "." + GetSubstringAfterLastDot(media.url));
+			    Debug.LogWarning(content.id + "^ " + media.url + "  =  " + GetSubstringAfterLastDot(media.url));
+			    UnityWebRequest request = UnityWebRequest.Get(media.url);
+			    yield return request.SendWebRequest();
 
-			//    if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-			//    {
-			//        Debug.LogError("Ошибка загрузки аудио: " + request.error);
-			//    }
-			//    else
-			//    {
-			//        File.WriteAllBytes(localPath, request.downloadHandler.data);
-			//        Debug.Log("Видео сохранено: " + localPath);
-			//    }
-			//}
-		}
+			    if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+			    {
+			        Debug.LogError("Ошибка загрузки аудио: " + request.error);
+			    }
+			    else
+			    {
+			        File.WriteAllBytes(localPath, request.downloadHandler.data);
+			        Debug.Log("Видео сохранено: " + localPath);
+			    }
+			}*/
+			}
 		//textures.Clear();
 	}
 
