@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -16,7 +16,8 @@ public class Galery : MonoBehaviour
     public Button rightBtn;
     
     public Sprite plug;
-    public List<Sprite> listSprite = new ();
+	public List<Sprite> listSprite = new List<Sprite>();
+	public List<string> listDescriptions = new List<string>();
     public int indexContent;
     public string filmUrl;
     //public RenderTexture videoTexture;
@@ -28,7 +29,8 @@ public class Galery : MonoBehaviour
     public void LoadMedia()
     {
         ButtonFilters.DeleteAllChildren(gameObject);
-        listSprite.Clear();
+	    listSprite.Clear();
+	    listDescriptions.Clear();
         int len = 0;
         GameObject line = Instantiate(linePrefab, this.transform);
         foreach (Archive.Media media in mediaList)
@@ -41,17 +43,21 @@ public class Galery : MonoBehaviour
                 {
                     // Загрузка изображения из локального файла
                     //string filePath = Path.Combine(Application.persistentDataPath, media.id + ".png");
-                    string filePath = Path.Combine(archive.GetComponent<Archive>().folderPath, media.id + ".png");
-                    if (File.Exists(filePath))
-                    {
-                        if (IsFileLargerThan1_8MB(filePath))
-                        {
-                            filePath = Path.Combine(archive.GetComponent<Archive>().folderResizePath, media.id + ".png");
-                        }
+                    
+	                string filePath = Path.Combine(archive.GetComponent<Archive>().folderResizePath, media.id + ".png");
+	               
+	                if (!File.Exists(filePath)) 
+	                {
+		                filePath = Path.Combine(archive.GetComponent<Archive>().folderPath, media.id + ".png");
+		           }
+	                
+	               if (File.Exists(filePath))
+	               {
                         texture = archive.GetComponent<Archive>().LoadAndResizeTexture(filePath, 1024, 1024);
                     }
                     else
-                    {
+	               {
+                    	Debug.Log("Файла " + filePath + " не сушествует D:");
                         texture = plug.texture; // Используйте заглушку, если файл не найден
                     }
 
@@ -203,7 +209,8 @@ public class Galery : MonoBehaviour
     }
     void CreateImage(Sprite sprite, GameObject line, String descriprion, int width = -1)
     {
-        listSprite.Add(sprite);
+	    listSprite.Add(sprite);
+	    listDescriptions.Add(descriprion);
         GameObject imageObject = Instantiate(imagePrefab, line.transform);
         Image imageComponent = imageObject.GetComponent<Image>();
         ClickGalery click = imageObject.AddComponent<ClickGalery>();

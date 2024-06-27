@@ -39,10 +39,8 @@ public class ClickGalery : MonoBehaviour
 		if(index < galeryController.GetComponent<Galery>().listSprite.Count -1)
 		{
 			index++;
-			Debug.LogWarning(index);
-			MediaPlayer.transform.GetChild(2).gameObject.transform.GetChild(0).GetComponent<Image>().sprite = galeryController.GetComponent<Galery>().listSprite[index];
-			if (index == galeryController.GetComponent<Galery>().listSprite.Count - 1) rightBtn.interactable = false;
-			if (index == 1) leftBtn.interactable = true;
+			
+			UpdateButtons();
 		}
 	}
 	public void ClickLeft()
@@ -50,10 +48,27 @@ public class ClickGalery : MonoBehaviour
 		if (index > 0)
 		{
 			index--;
-			Debug.LogWarning(index);
-			MediaPlayer.transform.GetChild(2).gameObject.transform.GetChild(0).GetComponent<Image>().sprite = galeryController.GetComponent<Galery>().listSprite[index];
-			if (index == 0) leftBtn.interactable = false;
-			if (index == galeryController.GetComponent<Galery>().listSprite.Count - 2) rightBtn.interactable = true;
+
+			UpdateButtons();
+		}
+	}
+	
+	public void UpdateButtons() 
+	{
+		MediaPlayer.transform.GetChild(2).gameObject.transform.GetChild(0).GetComponent<Image>().sprite = galeryController.GetComponent<Galery>().listSprite[index];
+		MediaPlayer.transform.GetChild(2).gameObject.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = galeryController.GetComponent<Galery>().listDescriptions[index];
+		if (index == 0) 
+		{
+			leftBtn.interactable = false;
+		}
+		else leftBtn.interactable = true;
+		if (index < galeryController.GetComponent<Galery>().listSprite.Count - 1) 
+		{
+			rightBtn.interactable = true;
+		}
+		else 
+		{
+			rightBtn.interactable = false;
 		}
 	}
 }

@@ -16,10 +16,10 @@ public class Archive : MonoBehaviour
 {
 	//public const string adminApi = "http://192.168.0.184:8888/api/harmony/";
 
-	//public const string adminApi = "http://62.109.23.170:8888/api/harmony/";
+	//public const string adminApi = "http://62.109.23.170:8888/api/harmony/"; //тест
 	
-	public const string adminApi = "http://95.188.79.124:8888/api/harmony/";
-	//public const string adminApi = "http://192.168.0.240:8888/api/harmony/";
+	//public const string adminApi = "http://95.188.79.124:8888/api/harmony/"; //прод
+	public const string adminApi = "http://192.168.0.240:8888/api/harmony/"; //локалка
 	
 	public List<string> categoriesType = new List<string>() { "MUSIC", "THEATRE", "CINEMA", "LITERATURE", "JOURNEY" };
 	public List<string> mediaType = new List<string>() { "FACT", "PHOTO_VIDEO", "MOVIE", "SOUND", "COVER" }; //только для запроса conntent/{id content}/media
